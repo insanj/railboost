@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "railboost",
+  "version": "${version}",
+
+  "name": "railboost",
+
+  "authors": [
+    {
+     "name": "Julian (insanj) Weiss",
+      "contact": {
+        "email": "me@insanj.com",
+        "homepage": "https://insanj.github.io/railboost/",
+        "issues": "https://github.com/insanj/railboost/issues",
+        "sources": "https://github.com/insanj/railboost/"
+      }
+    }
+  ],
+
+
+  "license": "MIT",
+  "contact": {
+    "email": "me@insanj.com",
+    "homepage": "https://insanj.github.io/railboost/",
+    "issues": "https://github.com/insanj/railboost/issues",
+    "sources": "https://github.com/insanj/railboost/"
+  },
+
+  "environment": "*",
+  "mixins" : [
+    "mixins.railboost.common.json"
+  ],
+
+  "requires" : {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  },
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  }
+}
+

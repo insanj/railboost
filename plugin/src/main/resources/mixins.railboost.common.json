@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.insanj.railboost.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinFireworkItem"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

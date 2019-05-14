@@ -22,36 +22,77 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.FireworkItem;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.UseAction;
+import net.minecraft.util.ActionResult;
 
-@Mixin(value = Item.class, priority = 5000)
+@Mixin(value = Item.class)
 public class MixinFireworkItem {
-    @Inject(method = "onItemStopUsing", at = @At(value = "HEAD")) 
-    private void onItemStopUsing(ItemStack stack, World world, LivingEntity entity, int i, CallbackInfo ci) {//(World world, LivingEntity entity, ItemStack stack, int timeLeft, CallbackInfo ci) {
-        System.out.println("step 1");
+    @Inject(method = "use", at = @At(value = "RETURN"), cancellable=true)
+    public void use(World world, PlayerEntity player, Hand hand, CallbackInfoReturnable ci) {
+        System.out.println("[MixinFireworkItem] use " + hand);
+    }
 
-        Item item = stack.getItem(); //(Item)(Object)this;
+    @Inject(method = "useOnBlock", at = @At(value = "RETURN"), cancellable=true)
+    public void useOnBlock(ItemUsageContext usageContext, CallbackInfoReturnable ci) {
+        System.out.println("[MixinFireworkItem] useOnBlock starting thang");
 
-        if (item instanceof FireworkItem) {
-            System.out.println("step 2");
+        if (usageContext.getWorld().getServer() != null && usageContext.getWorld().getServer().isRemote()) {
+            System.out.println("[MixinFireworkItem] beyond isRemote check");
 
-            if (entity.hasVehicle() == true) {
-                System.out.println("step 3");
+            ItemStack stack = usageContext.getItemStack();
+            if (stack.getItem() instanceof FireworkItem) {
+                System.out.println("[MixinFireworkItem] useOnBlock confirmed FireworkItem instance");
 
-                Entity vehicle = entity.getVehicle();
-                if (vehicle instanceof MinecartEntity) {
-                    System.out.println("step 4");
+                PlayerEntity player = usageContext.getPlayer();
+                if (player.hasVehicle() == true && player.getVehicle() instanceof MinecartEntity) {
+                    System.out.println("[MixinFireworkItem] player confirmed riding minecart and used firework!");
 
-                    Direction facing = entity.getHorizontalFacing();
-                    entity.addVelocity(facing.getOffsetX(), facing.getOffsetY(), facing.getOffsetZ());
-                    entity.velocityDirty = true;
+                    Entity vehicle = player.getVehicle();
+                    // BlockPos offPos = usageContext.getBlockPos().offset(usageContext.getFacing());
+                    Direction facing = usageContext.getFacing();
+                    System.out.println(String.format("[MixinFireworkItem] adjusting velocity, facing = %s, x = %d, z = %d", facing, facing.getOffsetX(), facing.getOffsetZ()));
 
-                    System.out.println("step 5");
+                    double deltaX = facing.getOffsetX() * 4.0;
+                    double deltaZ = facing.getOffsetZ() * 4.0;
+
+                    player.addVelocity(deltaX, 0, deltaZ);
+                    player.velocityDirty = true;
+
+                    System.out.println(String.format("[MixinFireworkItem] finished adding velocity + %s, deltaX = %d, z = %d", player.getVelocity(), deltaX, deltaZ));
                 }
             }
         }
+    }
+
+    // ****
+    @Inject(method = "getUseAction", at = @At(value = "RETURN"), cancellable=true)
+    public void getUseAction(ItemStack stack, CallbackInfoReturnable ci) {
+        Object action = ci.getReturnValue();
+        System.out.println("[MixinFireworkItem] getUseAction " + action);
+    }
+
+    @Inject(method = "onUsingTick", at = @At(value = "HEAD"))
+    public void onUsingTick(World world, LivingEntity entity, ItemStack stack, int timeLeft, CallbackInfo ci) {
+        System.out.println("[MixinFireworkItem] onUsingTick " + stack);
+    }
+
+    @Inject(method = "onEntityTick", at = @At(value = "HEAD"))
+    public void onEntityTick(ItemStack stack, World world, Entity entity, int invSlot, boolean selected, CallbackInfo ci) {
+        System.out.println("[MixinFireworkItem] onEntityTick " + stack);
+    }
+
+    @Inject(method = "onItemFinishedUsing", at = @At(value = "RETURN"))
+    public void onItemFinishedUsing(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable ci) {
+        System.out.println("[MixinFireworkItem] onItemFinishedUsing " + stack);
+    }
+
+    @Inject(method = "onItemStopUsing", at = @At(value = "HEAD"))
+    public void onItemStopUsing(ItemStack stack, World world, LivingEntity entity, int i, CallbackInfo ci) {
+        System.out.println("[MixinFireworkItem] onItemStopUsing " + stack);
     }
 }

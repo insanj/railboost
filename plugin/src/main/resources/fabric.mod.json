@@ -2,9 +2,8 @@
   "schemaVersion": 1,
   "id": "railboost",
   "version": "${version}",
-
   "name": "railboost",
-
+  "description": "use firework rockets while in a minecart (fabric 1.14)",
   "authors": [
     {
      "name": "Julian (insanj) Weiss",
@@ -17,7 +16,6 @@
     }
   ],
 
-
   "license": "MIT",
   "contact": {
     "email": "me@insanj.com",
@@ -28,7 +26,7 @@
 
   "environment": "*",
   "mixins" : [
-    "mixins.railboost.common.json"
+    "railboost.mixins.json"
   ],
 
   "requires" : {

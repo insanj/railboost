@@ -53,22 +53,17 @@ public class MixinFireworkEntity {
             for (Entity e : entities) {
                 for (Entity p : e.getPassengerList()) {
                     Direction facing = p.getHorizontalFacing();
-                    System.out.println(String.format("[MixinFireworkEntity] moving minecart entity with passenger in range, facing %s", facing));
-
                     String cardinal = facing.toString();
                     if (cardinal.equals("north")) {
-                        e.move(MovementType.SELF, new Vec3d(0, 0, -1));
+                        e.move(MovementType.SELF, new Vec3d(0, 0, -4));
                     } else if (cardinal.equals("east")) {
-                        e.move(MovementType.SELF, new Vec3d(1, 0, 0));
+                        e.move(MovementType.SELF, new Vec3d(4, 0, 0));
                     } else if (cardinal.equals("west")) {
-                        e.move(MovementType.SELF, new Vec3d(-1, 0, 0));
+                        e.move(MovementType.SELF, new Vec3d(-4, 0, 0));
                     } else if (cardinal.equals("south")) {
-                        e.move(MovementType.SELF, new Vec3d(0, 0, 1));
+                        e.move(MovementType.SELF, new Vec3d(0, 0, 4));
                     }
                 }
-
-                // e.addVelocity(e.getVelocity().x, 0, e.getVelocity().z);
-                // e.velocityDirty = true;
             }
         }
     }

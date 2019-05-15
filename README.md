@@ -1,10 +1,18 @@
+<img src="https://user-images.githubusercontent.com/951011/57765415-610e1280-76d3-11e9-8619-cfdad5a2719f.png" width=200>
+
 # railboost
 
-use firework rockets while in a minecart (fabric 1.14)
+🎆 use firework rockets while in a minecart (fabric 1.14)
 
-## License
+## Authors
 
-### ash
+Julian (insanj) Weiss
+https://github.com/insanj
+https://twitter.com/insanj
+
+## Licenses
+
+### [ash](https://github.com/umollu/ash)
 
 <pre>
 MIT License
@@ -30,7 +38,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 </pre>
 
-### railboost
+### [railboost](https://github.com/insanj/railboost)
 
 <pre>
 MIT License

@@ -40,27 +40,16 @@ import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Field;
 
-@Mixin(EntityType.class)
-public class MixinEntityType {
-  @Inject(method="create", at=@At(value="RETURN"))
-  private void onCreate(World world, CompoundTag itemTag, Component name, PlayerEntity player, BlockPos pos, SpawnType spawnType, boolean b_1, boolean b_2, CallbackInfoReturnable ci) {
-    System.out.println("[MixinEntityType] onCreate");
+@Mixin(Entity.class)
+public class MixinEntity {
+  @Inject(method="interactAt", at=@At(value="RETURN"))
+  private void onInteractAt(PlayerEntity player, Vec3d hitPos, Hand hand, CallbackInfoReturnable ci) {
+    System.out.println("[MixinEntity] onInteractAt");
   }
 
-   /* @Inject(method = "spawnFromItemStack", at = @At(value="RETURN"))
-    private void onSpawnFromItemStack(World world, ItemStack stack, PlayerEntity player, BlockPos pos, SpawnType spawnType, boolean b1, boolean b2, CallbackInfoReturnable ci) {
-        System.out.println("[MixinEntityType] onSpawnFromItemStack ");
-    }
-/*
-    @Inject(method = "spawn", at = @At(value="RETURN"))
-    private void onSpawn(World world, CompoundTag itemTag, Component name, PlayerEntity player, BlockPos pos, SpawnType spawnType, boolean b1, boolean b2, CallbackInfoReturnable ci) {
-        System.out.println("[MixinEntityType] onSpawn ");
-    }*/
+  @Inject(method="interact", at=@At(value="RETURN"))
+  private void onInteract(PlayerEntity player, Hand hand, CallbackInfoReturnable ci) {
+    System.out.println("[MixinEntity] interact");
+  }
 }
 
-/*
-Expected (Lnet/minecraft/class_1937;Lnet/minecraft/class_1799;Lnet/minecraft/class_1657;Lnet/minecraft/class_2338;Lnet/minecraft/class_3730;ZZLorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V
-
- but found (Lnet/minecraft/class_1937;Lnet/minecraft/class_1799;Lnet/minecraft/class_1657;Lnet/minecraft/class_2338;Lnet/minecraft/class_3730;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;)V
- at 
- */

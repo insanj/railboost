@@ -31,8 +31,10 @@ import net.minecraft.util.UseAction;
 import net.minecraft.util.ActionResult;
 import net.minecraft.entity.FireworkEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.server.world.ServerWorld;
 
 import java.lang.reflect.Field;
 
@@ -40,11 +42,34 @@ import java.lang.reflect.Field;
 public class MixinFireworkEntity {
     // @Inject(at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;alphaFunc(IF)V"), method = "render")
      //"FIELD")), target="Lnet/minecraft/entity/FireworkEntity;shooter:Lnet/minecraft/entity/LivingEntity;"))
+   // Expected (Lnet/minecraft/class_1299;Lnet/minecraft/class_1937;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V but found (Lnet/minecraft/class_1937;DDDLnet/minecraft/class_1799;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V 
+
     @Inject(method = "<init>*", at = @At(value="RETURN"))
-    private void onFireworkShooterInit(CallbackInfo ci) {
-        System.out.println(String.format("[MixinFireworkEntity] onFireworkShooterInit %s ci %s getId %s", this, ci, ci.getId()));
+    private void onFireworkInit(CallbackInfo ci) {
+        System.out.println(String.format("[MixinFireworkEntity] onFireworkInit %s tag %s", this.getClass().getSuperclass(), ((Entity)(Object)this).toTag(new CompoundTag())));
 
         FireworkEntity firework = (FireworkEntity)(Object)this;
+        if (firework.getWorld() instanceof ServerWorld) {
+            ServerWorld world = (ServerWorld)firework.getWorld();
+            Predicate pred = (e) -> e.distanceTo(firework) < 20.0;
+            List<Entity> entities = world.getEntities(EntityType.MINECART, pred);
+            for (Entity e : entities) {
+                 System.out.println(String.format("[MixinFireworkEntity] ServerWorld entity = %s", e));   
+            }
+        }
+    }
+
+/*
+    @Inject(method = "<init>", at = @At(value="RETURN"))
+    private void onFireworkShotAtAngleInit(World world, ItemStack item, double x, double y, double z, boolean shotAtAngle, CallbackInfo ci) {
+        System.out.println(String.format("[MixinFireworkEntity] onFireworkShotAtAngleInit"));
+    }
+
+    @Inject(method = "<init>", at = @At(value="RETURN"))
+    private void onFireworkShooterInit(World world, ItemStack item, LivingEntity shooter, CallbackInfo ci) {
+        System.out.println(String.format("[MixinFireworkEntity] onFireworkShooterInit"));
+
+       // FireworkEntity firework = (FireworkEntity)(Object)this;
         /*if (firework.getServer() == null) {
             System.out.println("[MixinFireworkEntity] detected non-server, don't do anything?");
             return;
@@ -55,6 +80,7 @@ public class MixinFireworkEntity {
         //    return;
         //}
 
+        /*
         Field shooterField;
         LivingEntity entity;
         try {
@@ -95,6 +121,6 @@ public class MixinFireworkEntity {
 
         System.out.println(String.format("[MixinFireworkEntity] sending origin %s x %d z %d offset %s x %f y %f z %f", origin, origin.getX(), origin.getZ(), offset, offset.x, offset.y, offset.z));
 
-        entity.move(type, offset);
-    }
+        entity.move(type, offset);*/
+    //}
 }

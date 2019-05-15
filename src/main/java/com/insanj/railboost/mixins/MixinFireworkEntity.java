@@ -36,91 +36,40 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.server.world.ServerWorld;
 
+import java.util.function.Predicate;
 import java.lang.reflect.Field;
+import java.util.List;
 
 @Mixin(FireworkEntity.class)
 public class MixinFireworkEntity {
-    // @Inject(at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;alphaFunc(IF)V"), method = "render")
-     //"FIELD")), target="Lnet/minecraft/entity/FireworkEntity;shooter:Lnet/minecraft/entity/LivingEntity;"))
-   // Expected (Lnet/minecraft/class_1299;Lnet/minecraft/class_1937;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V but found (Lnet/minecraft/class_1937;DDDLnet/minecraft/class_1799;Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V 
-
     @Inject(method = "<init>*", at = @At(value="RETURN"))
     private void onFireworkInit(CallbackInfo ci) {
-        System.out.println(String.format("[MixinFireworkEntity] onFireworkInit %s tag %s", this.getClass().getSuperclass(), ((Entity)(Object)this).toTag(new CompoundTag())));
-
         FireworkEntity firework = (FireworkEntity)(Object)this;
-        if (firework.getWorld() instanceof ServerWorld) {
-            ServerWorld world = (ServerWorld)firework.getWorld();
-            Predicate pred = (e) -> e.distanceTo(firework) < 20.0;
+        if (firework.getEntityWorld() instanceof ServerWorld) {
+            ServerWorld world = (ServerWorld)firework.getEntityWorld();
+            Predicate pred = (e) -> e instanceof MinecartEntity && ((MinecartEntity)e).hasPassengers() == true && ((Entity)e).distanceTo(firework) <= 10.0F;
             List<Entity> entities = world.getEntities(EntityType.MINECART, pred);
+
             for (Entity e : entities) {
-                 System.out.println(String.format("[MixinFireworkEntity] ServerWorld entity = %s", e));   
+                for (Entity p : e.getPassengerList()) {
+                    Direction facing = p.getHorizontalFacing();
+                    System.out.println(String.format("[MixinFireworkEntity] moving minecart entity with passenger in range, facing %s", facing));
+
+                    String cardinal = facing.toString();
+                    if (cardinal.equals("north")) {
+                        e.move(MovementType.SELF, new Vec3d(0, 0, -1));
+                    } else if (cardinal.equals("east")) {
+                        e.move(MovementType.SELF, new Vec3d(1, 0, 0));
+                    } else if (cardinal.equals("west")) {
+                        e.move(MovementType.SELF, new Vec3d(-1, 0, 0));
+                    } else if (cardinal.equals("south")) {
+                        e.move(MovementType.SELF, new Vec3d(0, 0, 1));
+                    }
+                }
+
+                // e.addVelocity(e.getVelocity().x, 0, e.getVelocity().z);
+                // e.velocityDirty = true;
             }
         }
     }
-
-/*
-    @Inject(method = "<init>", at = @At(value="RETURN"))
-    private void onFireworkShotAtAngleInit(World world, ItemStack item, double x, double y, double z, boolean shotAtAngle, CallbackInfo ci) {
-        System.out.println(String.format("[MixinFireworkEntity] onFireworkShotAtAngleInit"));
-    }
-
-    @Inject(method = "<init>", at = @At(value="RETURN"))
-    private void onFireworkShooterInit(World world, ItemStack item, LivingEntity shooter, CallbackInfo ci) {
-        System.out.println(String.format("[MixinFireworkEntity] onFireworkShooterInit"));
-
-       // FireworkEntity firework = (FireworkEntity)(Object)this;
-        /*if (firework.getServer() == null) {
-            System.out.println("[MixinFireworkEntity] detected non-server, don't do anything?");
-            return;
-        }*/
-
-        //if (firework.wasShotByEntity() == false) {
-        //    System.out.println("[MixinFireworkEntity] firework was not shot by entity, ignoring");
-        //    return;
-        //}
-
-        /*
-        Field shooterField;
-        LivingEntity entity;
-        try {
-            Field[] fields = firework.getClass().getDeclaredFields();
-            System.out.println("[MixinFireworkEntity] fields = " + fields);
-            for (Field f : fields) {
-                System.out.println("[MixinFireworkEntity] detected field " + f.getName());
-                f.setAccessible(true);
-                System.out.println("[MixinFireworkEntity] value = " + f.get(firework));
-            }
-
-            shooterField = firework.getClass().getDeclaredField("field_7616");
-            shooterField.setAccessible(true);
-            entity = (LivingEntity)shooterField.get(firework);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            System.out.println("[MixinFireworkEntity] exception accessing shooter of firework: " + e);
-            return;
-        }
-
-        if (entity == null) {
-            System.out.println("[MixinFireworkEntity] null shooter entity");
-            return;
-        }
-
-        System.out.println("[MixinFireworkEntity] shooter entity = " + entity);
-
-        if (!entity.hasVehicle() || !(entity.getVehicle() instanceof MinecartEntity)) {
-            System.out.println("[MixinFireworkEntity] entity not inside of minecart");
-            return;
-        }
-
-        Direction facing = entity.getHorizontalFacing();
-        System.out.println(String.format("[MixinFireworkEntity] facing %s x %d y %d z %d", facing, facing.getOffsetX(), facing.getOffsetY(), facing.getOffsetZ()));
-
-        MovementType type = MovementType.SELF;
-        Vec3i origin = facing.getVector();
-        Vec3d offset = new Vec3d(origin.getX() * 4, 0, origin.getZ() * 4); 
-
-        System.out.println(String.format("[MixinFireworkEntity] sending origin %s x %d z %d offset %s x %f y %f z %f", origin, origin.getX(), origin.getZ(), offset, offset.x, offset.y, offset.z));
-
-        entity.move(type, offset);*/
-    //}
 }

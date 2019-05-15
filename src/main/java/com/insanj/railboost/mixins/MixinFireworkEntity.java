@@ -38,18 +38,35 @@ import java.lang.reflect.Field;
 
 @Mixin(FireworkEntity.class)
 public class MixinFireworkEntity {
-    @Inject(method = "<init>*", at = @At("RETURN"))
-    private void init(CallbackInfo ci) {
-        System.out.println("[MixinFireworkEntity] init " + this);
+    // @Inject(at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;alphaFunc(IF)V"), method = "render")
+     //"FIELD")), target="Lnet/minecraft/entity/FireworkEntity;shooter:Lnet/minecraft/entity/LivingEntity;"))
+    @Inject(method = "<init>*", at = @At(value="RETURN"))
+    private void onFireworkShooterInit(CallbackInfo ci) {
+        System.out.println(String.format("[MixinFireworkEntity] onFireworkShooterInit %s ci %s getId %s", this, ci, ci.getId()));
 
         FireworkEntity firework = (FireworkEntity)(Object)this;
-        Field[] fields = firework.getClass().getDeclaredFields();
-        System.out.println("[MixinFireworkEntity] fields = " + fields);
+        /*if (firework.getServer() == null) {
+            System.out.println("[MixinFireworkEntity] detected non-server, don't do anything?");
+            return;
+        }*/
+
+        //if (firework.wasShotByEntity() == false) {
+        //    System.out.println("[MixinFireworkEntity] firework was not shot by entity, ignoring");
+        //    return;
+        //}
 
         Field shooterField;
         LivingEntity entity;
         try {
-            shooterField = firework.getClass().getDeclaredField("shooter");
+            Field[] fields = firework.getClass().getDeclaredFields();
+            System.out.println("[MixinFireworkEntity] fields = " + fields);
+            for (Field f : fields) {
+                System.out.println("[MixinFireworkEntity] detected field " + f.getName());
+                f.setAccessible(true);
+                System.out.println("[MixinFireworkEntity] value = " + f.get(firework));
+            }
+
+            shooterField = firework.getClass().getDeclaredField("field_7616");
             shooterField.setAccessible(true);
             entity = (LivingEntity)shooterField.get(firework);
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -58,9 +75,11 @@ public class MixinFireworkEntity {
         }
 
         if (entity == null) {
-            System.out.println("[MixinFireworkEntity] null entity");
+            System.out.println("[MixinFireworkEntity] null shooter entity");
             return;
         }
+
+        System.out.println("[MixinFireworkEntity] shooter entity = " + entity);
 
         if (!entity.hasVehicle() || !(entity.getVehicle() instanceof MinecartEntity)) {
             System.out.println("[MixinFireworkEntity] entity not inside of minecart");

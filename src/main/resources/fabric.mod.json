@@ -3,7 +3,7 @@
   "id": "railboost",
   "version": "${version}",
   "name": "railboost",
-  "description": "use firework rockets while in a minecart (fabric 1.14)",
+  "description": "use firework rockets while in a minecart (fabric 1.14/1.14.1)",
   "authors": [
     {
      "name": "Julian (insanj) Weiss",
@@ -25,9 +25,11 @@
   },
 
   "environment": "*",
-  "mixins" : [
-    "railboost.mixins.json"
-  ],
+  "entrypoints": {
+    "main": [
+      "com.insanj.railboost.RailboostMod"
+    ]
+  },
 
   "requires" : {
     "fabricloader": ">=0.4.0",

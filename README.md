@@ -2,7 +2,7 @@
 
 # railboost
 
-🎆 use firework rockets while in a minecart (fabric 1.14)
+🎆 use firework rockets while in a minecart. also works in boats and other vehicles! (fabric 1.14/1.14.1)
 
 ## Authors
 
